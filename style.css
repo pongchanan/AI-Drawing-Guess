@@ -30,19 +30,56 @@ body {
     width: 90%;
 }
 
+header {
+    margin-bottom: 2rem;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
 header h1 {
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 2.5rem;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.score-board {
+    background: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    font-size: 1.2rem;
+}
+
+.target-container {
+    background: #e1e6fa;
+    padding: 1rem;
+    border-radius: 12px;
+    color: var(--primary-color);
+}
+
+.target-container p {
+    margin: 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+#target-word {
+    margin: 0.5rem 0 0 0;
+    font-size: 2rem;
+    text-transform: capitalize;
 }
 
 .highlight {
     color: var(--primary-color);
-}
-
-header p {
-    color: var(--text-muted);
-    margin-bottom: 2rem;
 }
 
 #canvas-wrapper {
@@ -60,6 +97,45 @@ header p {
     /* Fill container */
     overflow: hidden;
     /* Ensure canvas doesn't overflow corners */
+    position: relative;
+}
+
+#game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    pointer-events: none;
+    /* Let clicks pass through if needed, but usually blocks drawing */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#game-overlay.visible {
+    opacity: 1;
+}
+
+.success-msg {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #00b894;
+    transform: scale(0.5);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#game-overlay.visible .success-msg {
+    transform: scale(1);
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 #canvas-wrapper:hover {

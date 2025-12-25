@@ -1,3 +1,13 @@
+// Game Variables
+let targetWord = '';
+let score = 0;
+let isGameActive = true;
+let gameWords = [
+    'cat', 'dog', 'tree', 'house', 'face', 'apple', 'book', 'bow', 'candle', 'car',
+    'cloud', 'cup', 'door', 'envelope', 'fish', 'guitar', 'ice_cream', 'key', 'ladder',
+    'light_bulb', 'moon', 'mountain', 'pants', 'pizza', 'star', 'sun', 'umbrella'
+];
+
 // Initialize variables
 let classifier;
 let canvas;
@@ -5,20 +15,21 @@ let canvas;
 // let labelSpan;
 // let confidenceSpan;
 let clearButton;
-
-// Preload the model
-function preload() {
-    // Using 'DoodleNet' which is trained on the Quick Draw dataset
-    classifier = ml5.imageClassifier('DoodleNet', modelReady);
-}
+let skipButton;
 
 // Flag to prevent early classification
 let isModelReady = false;
 let inputImage; // Offscreen buffer
 
+function preload() {
+    // Using 'DoodleNet' which is trained on the Quick Draw dataset
+    // Model loading moved to setup to avoid blocking
+}
+
 function modelReady() {
     console.log('Model Loaded!');
     isModelReady = true;
+    nextRound(); // Start the first round when model is ready
 }
 
 function setup() {
@@ -42,15 +53,64 @@ function setup() {
     // Set white background initially
     background(255);
 
+    // Load the model asynchronously WITHOUT blocking the canvas
+    console.log('Loading model...');
+    classifier = ml5.imageClassifier('DoodleNet', modelReady);
+
     // Get DOM elements with p5 (only for button or simple interactions)
     clearButton = select('#clearBtn');
+    skipButton = select('#skipBtn');
 
     // Attach event listener to clear button
     clearButton.mousePressed(clearCanvas);
+    skipButton.mousePressed(nextRound);
 
     // Initial label
-    document.getElementById('label').innerText = 'Draw something...';
+    document.getElementById('label').innerText = 'Draw...';
     document.getElementById('confidence').innerText = '0%';
+    console.log('Canvas cleared');
+}
+
+function nextRound() {
+    isGameActive = true;
+
+    // Hide overlay
+    let overlay = document.getElementById('game-overlay');
+    if (overlay) {
+        overlay.classList.remove('visible');
+        overlay.classList.add('hidden');
+    }
+
+    // Pick random word
+    targetWord = random(gameWords);
+
+    let targetEl = document.getElementById('target-word');
+    if (targetEl) {
+        targetEl.innerText = targetWord.replace(/_/g, ' ');
+    }
+
+    // Clear canvas
+    clearCanvas();
+}
+
+function handleWin() {
+    if (!isGameActive) return;
+
+    isGameActive = false;
+    score++;
+
+    let scoreEl = document.getElementById('score');
+    if (scoreEl) scoreEl.innerText = score;
+
+    // Show overlay
+    let overlay = document.getElementById('game-overlay');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('visible');
+    }
+
+    // Wait and start next round
+    setTimeout(nextRound, 2000);
 }
 
 function clearCanvas() {
@@ -60,7 +120,7 @@ function clearCanvas() {
         inputImage.background(255);
     }
 
-    document.getElementById('label').innerText = 'Draw something...';
+    document.getElementById('label').innerText = 'Draw...';
     document.getElementById('confidence').innerText = '0%';
     console.log('Canvas cleared');
 }
@@ -71,7 +131,7 @@ function draw() {
     strokeWeight(16);
 
     // Draw if mouse is pressed
-    if (mouseIsPressed) {
+    if (mouseIsPressed && isGameActive) {
         line(pmouseX, pmouseY, mouseX, mouseY);
 
         // Also draw on the offscreen buffer to keep them in sync
@@ -80,15 +140,14 @@ function draw() {
             inputImage.strokeWeight(16);
             inputImage.line(pmouseX, pmouseY, mouseX, mouseY);
         }
-        // We classify every time we draw a line segment for "real-time" feel
-        // However, to avoid spamming, we could throttle this or just use mouseReleased.
-        // For smoother feel, let's classify on mouseReleased.
     }
 }
 
 // Classify when the user finishes a stroke
 function mouseReleased() {
-    classifyCanvas();
+    if (isGameActive) {
+        classifyCanvas();
+    }
 }
 
 function classifyCanvas() {
@@ -101,7 +160,7 @@ function classifyCanvas() {
             console.error('Classification error:', e);
         }
     } else {
-        console.warn('Model not ready yet.');
+        // console.warn('Model not ready yet.');
     }
 }
 
@@ -123,7 +182,8 @@ function gotResult(error, results) {
 
     // Update the UI
     let topResult = results[0];
-    let label = topResult.label.replace(/_/g, ' ');
+    let label = topResult.label; // Raw label for logic
+    let displayLabel = label.replace(/_/g, ' '); // Clean label for display
     let confidence = topResult.confidence;
 
     let confidenceText = Math.floor(confidence * 100) + '%';
@@ -135,7 +195,7 @@ function gotResult(error, results) {
         let confEl = document.getElementById('confidence');
 
         if (labelEl) {
-            labelEl.innerText = label;
+            labelEl.innerText = displayLabel;
             labelEl.style.color = '#6c5ce7'; // Force color just in case
         } else {
             // console.error('CRITICAL: #label element not found!');
@@ -146,6 +206,13 @@ function gotResult(error, results) {
         } else {
             // console.error('CRITICAL: #confidence element not found!');
         }
+
+        // CHECK WIN CONDITION
+        // Using a very low confidence threshold because simple drawings might score poorly but still be "top1"
+        if (label === targetWord && confidence > 0.01) {
+            handleWin();
+        }
+
     } catch (e) {
         console.error('Error updating DOM:', e);
     }

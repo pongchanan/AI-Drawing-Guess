@@ -20,23 +20,30 @@
 <body>
     <div class="app-container">
         <header>
-            <h1>AI Draw <span class="highlight">Guess</span></h1>
-            <p>Draw something in the box below and I'll try to guess it!</p>
+            <div class="header-top">
+                <h1>AI Draw <span class="highlight">Guess</span></h1>
+                <div class="score-board">Score: <span id="score">0</span></div>
+            </div>
+            <div class="target-container">
+                <p>Your Mission: Draw a...</p>
+                <h2 id="target-word">...</h2>
+            </div>
         </header>
 
         <main>
             <div id="canvas-wrapper">
                 <!-- Canvas will be injected here by p5.js -->
+                <div id="game-overlay" class="hidden">
+                    <div class="success-msg">Correct! 🎉</div>
+                </div>
             </div>
 
             <div class="controls">
-                <button id="clearBtn" class="btn primary-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        viewBox="0 0 16 16">
-                        <path
-                            d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                    </svg>
-                    Clear Canvas
+                <button id="clearBtn" class="btn secondary-btn">
+                    🗑️ Clear
+                </button>
+                <button id="skipBtn" class="btn primary-btn">
+                    ⏭️ Skip Word
                 </button>
             </div>
 
