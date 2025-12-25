@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Draw & Guess</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- p5.js and ml5.js libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1>AI Draw <span class="highlight">Guess</span></h1>
+            <p>Draw something in the box below and I'll try to guess it!</p>
+        </header>
+
+        <main>
+            <div id="canvas-wrapper">
+                <!-- Canvas will be injected here by p5.js -->
+            </div>
+
+            <div class="controls">
+                <button id="clearBtn" class="btn primary-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                    </svg>
+                    Clear Canvas
+                </button>
+            </div>
+
+            <div class="results-panel">
+                <div class="guess-item top-guess">
+                    <span class="label">Top Guess:</span>
+                    <span id="label" class="value">Draw something...</span>
+                </div>
+                <div class="guess-item confidence-item">
+                    <span class="label">Confidence:</span>
+                    <span id="confidence" class="value">0%</span>
+                </div>
+                <div id="guess-list" class="other-guesses">
+                    <!-- Other guesses can go here -->
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
